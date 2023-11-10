@@ -63,18 +63,25 @@ def follow_unfollow(user_name, task):
 
     if logged_in and task == 'follow':
         user_doc = users_collection.find_one({"username": user_name})
-        followers_collection.insert_one(
-            {"_id": Binary(uuid.uuid4().bytes, 4), "user_id": user_doc.get("_id"),
-             "username": user_doc.get("username")})
-        print("\n** follow successful **")
-        menu()
+        if user_doc:
+            followers_collection.insert_one(
+                {"_id": Binary(uuid.uuid4().bytes, 4), "user_id": user_doc.get("_id"),
+                 "username": user_doc.get("username")})
+            print("\n** follow successful **")
+            menu()
+        if not user_doc:
+            print("\n** username not found **")
+            menu()
 
     if logged_in and task == 'unfollow':
         user_doc = users_collection.find_one({"username": user_name})
-        followers_collection.delete_one({"username": user_doc.get("username")})
-        print("** unfollow successful **")
-        menu()
-
+        if user_doc:
+            followers_collection.delete_one({"username": user_doc.get("username")})
+            print("** unfollow successful **")
+            menu()
+        if not user_doc:
+            print("\n** username not found **")
+            menu()
     print("\n** please login before following or unfollowing a user **")
     menu()
 
@@ -131,13 +138,21 @@ def menu():
             print("\n** please login before posting a message **")
             menu()
     elif choice == 'F' or choice == 'f':
-        display_users()
-        username = str(input("\nEnter the username of the person you want to follow from the list: "))
-        follow_unfollow(username, 'follow')
+        if logged_in:
+            display_users()
+            username = str(input("\nEnter the username of the person you want to follow from the list: "))
+            follow_unfollow(username, 'follow')
+        else:
+            print("\n** please login before following a user **")
+            menu()
     elif choice == 'U' or choice == 'u':
-        username = str(input("\nEnter the username of the person you want to unfollow from the list: "))
-        display_users()
-        follow_unfollow(username, 'unfollow')
+        if logged_in:
+            display_users()
+            username = str(input("\nEnter the username of the person you want to unfollow from the list: "))
+            follow_unfollow(username, 'unfollow')
+        else:
+            print("\n** please login before unfollowing a user **")
+            menu()
     elif choice == 'V' or choice == 'v':
         if logged_in:
             username = str(input("\nEnter the username of the person you want view: "))
