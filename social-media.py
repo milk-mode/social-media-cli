@@ -14,6 +14,7 @@ followers_collection = database["followers"]
 logged_in = False
 user_document_id = ""
 logged_in_users_count=0
+logged_in_username=""
 
 def user_registration(username_param, password_param):
     # take username,password
@@ -122,8 +123,9 @@ def display_users():
 def menu():
     global logged_in
     global logged_in_users_count
-    print("\nMENU")
-    print("====")
+    global logged_in_username
+    print("\nMENU        Logged in user: [{}]".format(logged_in_username))
+    print("====       ........... ... ......  ")
     print("1. Register as a user, press 'R' or 'r'")
     print("2. Login as existing user, press 'L' or 'l'")
     print("3. Post a new message, press 'P' or 'p'")
@@ -175,6 +177,7 @@ def menu():
     elif choice == 'O' or choice == 'o' or choice == '7':
         logged_in = False
         logged_in_users_count=0
+        logged_in_username=""
         print("\n** log out success **")
         menu()
     elif choice == 'E' or choice == 'e' or choice == '8':
