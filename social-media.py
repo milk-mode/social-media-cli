@@ -13,7 +13,7 @@ followers_collection = database["followers"]
 
 logged_in = False
 user_document_id = ""
-
+logged_in_users_count=0
 
 def user_registration(username_param, password_param):
     # take username,password
@@ -34,16 +34,27 @@ def user_login(username_input, password_input):
     # fetch from database
     global user_document_id
     global logged_in
+    global logged_in_users_count
+    global logged_in_username
 
     user_document = users_collection.find_one({"username": username_input, "password": password_input})
-    if user_document:
-        logged_in = True
-        user_document_id = user_document.__getitem__("_id")
-        print("\n** login success **")
-
     if not user_document:
         logged_in = False
         print("\n** Invalid credentials **")
+    elif user_document and logged_in_users_count==0:
+        logged_in = True
+        user_document_id = user_document.__getitem__("_id")
+        logged_in_username=user_document.get("username")
+        logged_in_users_count+=1
+
+        print("\n** login success for '{}' **".format(logged_in_username))
+
+    elif user_document and logged_in_users_count > 0:
+        logged_in=False
+        print("Another user has logged in already, Logout '{}' first".format(logged_in_username))
+        menu()
+
+
     menu()
 
 
@@ -110,6 +121,7 @@ def display_users():
 
 def menu():
     global logged_in
+    global logged_in_users_count
     print("\nMENU")
     print("====")
     print("1. Register as a user, press 'R' or 'r'")
@@ -122,22 +134,22 @@ def menu():
     print("8. press 'E' or 'e' to exit program")
     choice = str(input("\nEnter choice:  "))
 
-    if choice == 'R' or choice == 'r':
+    if choice == 'R' or choice == 'r' or choice == '1':
         username_reg = str(input("\nEnter username: "))
         password_reg = str(input("Enter password: "))
         user_registration(username_reg, password_reg)
-    elif choice == 'L' or choice == 'l':
+    elif choice == 'L' or choice == 'l' or choice == '2':
         username_input = str(input("\nEnter username for login: "))
         password_input = str(input("Enter password for login: "))
         user_login(username_input, password_input)
-    elif choice == 'P' or choice == 'p':
+    elif choice == 'P' or choice == 'p' or choice == '3':
         if logged_in:
             message = str(input("\nEnter post message: "))
             post_messages(message)
         else:
             print("\n** please login before posting a message **")
             menu()
-    elif choice == 'F' or choice == 'f':
+    elif choice == 'F' or choice == 'f' or choice == '4':
         if logged_in:
             display_users()
             username = str(input("\nEnter the username of the person you want to follow from the list: "))
@@ -145,7 +157,7 @@ def menu():
         else:
             print("\n** please login before following a user **")
             menu()
-    elif choice == 'U' or choice == 'u':
+    elif choice == 'U' or choice == 'u' or choice == '5':
         if logged_in:
             display_users()
             username = str(input("\nEnter the username of the person you want to unfollow from the list: "))
@@ -153,18 +165,19 @@ def menu():
         else:
             print("\n** please login before unfollowing a user **")
             menu()
-    elif choice == 'V' or choice == 'v':
+    elif choice == 'V' or choice == 'v' or choice == '6':
         if logged_in:
             username = str(input("\nEnter the username of the person you want view: "))
             view_user_feed(username)
         else:
             print("\n** please login before viewing a feed **")
             menu()
-    elif choice == 'O' or choice == 'o':
+    elif choice == 'O' or choice == 'o' or choice == '7':
         logged_in = False
+        logged_in_users_count=0
         print("\n** log out success **")
         menu()
-    elif choice == 'E' or choice == 'e':
+    elif choice == 'E' or choice == 'e' or choice == '8':
         sys.exit(0)
     else:
         print("** Invalid choice **,choose again: ")
